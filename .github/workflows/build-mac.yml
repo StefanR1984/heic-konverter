@@ -110,6 +110,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
       - name: Artefakte herunterladen
         uses: actions/download-artifact@v4
         with:
@@ -123,4 +126,4 @@ jobs:
           gh release create "${GITHUB_REF_NAME}" artifacts/*.dmg artifacts/*.zip \
             --repo "${GITHUB_REPOSITORY}" \
             --title "HEIC Konverter ${GITHUB_REF_NAME}" \
-            --generate-notes
+            --notes-file docs/RELEASE_NOTES.md
