@@ -8,6 +8,19 @@ Unter Windows und Linux läuft sie ebenfalls (praktisch zum Entwickeln und Teste
 
 ---
 
+## Download (macOS)
+
+Fertige DMGs liegen unter **[Releases](https://github.com/StefanR1984/heic-konverter/releases)**:
+
+| Mac | Datei |
+| --- | --- |
+| Apple Silicon (M1–M4) | `HEIC-Konverter-<Version>-arm64.dmg` |
+| Intel | `HEIC-Konverter-<Version>-x64.dmg` |
+
+Die App ist nicht notarisiert, deshalb warnt macOS beim ersten Start. Die nötigen Schritte stehen in **[ANLEITUNG-MAC.txt](ANLEITUNG-MAC.txt)** (liegt auch im DMG bei).
+
+---
+
 ## Funktionen
 
 - **Drag & Drop** von Dateien und ganzen Ordnern (Ordner werden rekursiv durchsucht)
