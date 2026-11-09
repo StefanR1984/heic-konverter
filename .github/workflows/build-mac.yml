@@ -1,0 +1,109 @@
+name: macOS Build
+
+on:
+  # Manuell starten: Actions → macOS Build → "Run workflow"
+  workflow_dispatch:
+  # Beim Push eines Tags wie v1.0.0 zusätzlich ein GitHub-Release anlegen
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mac-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: macOS ${{ matrix.label }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            label: Apple Silicon (arm64)
+            runner: macos-15
+          - arch: x64
+            label: Intel (x64)
+            runner: macos-15-intel
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Node.js einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Abhängigkeiten installieren
+        run: npm ci
+
+      - name: App-Icon erzeugen
+        run: npm run icon
+
+      - name: macOS-App bauen (DMG + ZIP)
+        run: npx electron-builder --mac --${{ matrix.arch }} --publish never
+
+      - name: Signatur und native Module prüfen
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP_PATH=$(find release -maxdepth 2 -type d -name "*.app" | head -n 1)
+          echo "App: $APP_PATH"
+          codesign --verify --deep --strict --verbose=2 "$APP_PATH"
+          codesign -dv --verbose=4 "$APP_PATH" 2>&1 | head -n 20
+          BIN=$(find "$APP_PATH/Contents/MacOS" -maxdepth 1 -type f -perm -111 | head -n 1)
+          echo "Binary: $BIN"
+          ELECTRON_RUN_AS_NODE=1 "$BIN" -e '
+            const sharp = require(process.argv[1]);
+            console.log("sharp", sharp.versions.sharp, "| libvips", sharp.versions.vips, "|", process.arch);
+          ' "$APP_PATH/Contents/Resources/app.asar.unpacked/node_modules/sharp"
+
+      - name: App-Start testen (informativ)
+        shell: bash
+        continue-on-error: true
+        run: |
+          APP_PATH=$(find release -maxdepth 2 -type d -name "*.app" | head -n 1)
+          open -n "$APP_PATH"
+          sleep 10
+          if pgrep -fl "HEIC Konverter"; then
+            echo "App läuft nach dem Start."
+            pkill -f "HEIC Konverter" || true
+          else
+            echo "App ist nach dem Start nicht mehr aktiv – Logs prüfen."
+          fi
+
+      - name: Artefakte hochladen
+        uses: actions/upload-artifact@v4
+        with:
+          name: heic-konverter-macos-${{ matrix.arch }}
+          path: |
+            release/*.dmg
+            release/*.zip
+          if-no-files-found: error
+          retention-days: 30
+
+  release:
+    name: Release veröffentlichen
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Artefakte herunterladen
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: GitHub-Release anlegen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" artifacts/*.dmg artifacts/*.zip \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "HEIC Konverter ${GITHUB_REF_NAME}" \
+            --generate-notes

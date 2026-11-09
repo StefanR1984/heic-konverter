@@ -1,0 +1,99 @@
+{
+  "name": "heic-konverter",
+  "productName": "HEIC Konverter",
+  "version": "1.0.0",
+  "description": "HEIC/HEIF-Bilder in JPG, PNG, WebP, AVIF und TIFF umwandeln",
+  "main": "src/main.js",
+  "author": "HEIC Konverter",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "icon": "node scripts/make-icon.js",
+    "test:convert": "node scripts/test-convert.js",
+    "dist:mac": "electron-builder --mac",
+    "dist:mac:arm64": "electron-builder --mac --arm64",
+    "dist:mac:x64": "electron-builder --mac --x64",
+    "dist:win": "electron-builder --win"
+  },
+  "dependencies": {
+    "heic-decode": "^2.1.0",
+    "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "electron": "^45.2.3",
+    "electron-builder": "^26.18.0"
+  },
+  "build": {
+    "appId": "de.heickonverter.app",
+    "productName": "HEIC Konverter",
+    "copyright": "Copyright © 2026",
+    "artifactName": "HEIC-Konverter-${version}-${arch}.${ext}",
+    "files": [
+      "src/**/*",
+      "build/icon.png",
+      "package.json"
+    ],
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "asarUnpack": [
+      "src/converter-worker.js",
+      "src/lib/**",
+      "**/node_modules/**"
+    ],
+    "fileAssociations": [
+      {
+        "ext": [
+          "heic",
+          "heif"
+        ],
+        "name": "HEIC-Bild",
+        "role": "Viewer"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.utilities",
+      "icon": "build/icon.png",
+      "darkModeSupport": true,
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "identity": "-",
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.inherit.plist",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "dmg": {
+      "title": "HEIC Konverter",
+      "contents": [
+        {
+          "x": 140,
+          "y": 200
+        },
+        {
+          "x": 400,
+          "y": 200,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "win": {
+      "icon": "build/icon.png",
+      "target": "nsis"
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "category": "Graphics",
+      "target": "AppImage"
+    }
+  }
+}
