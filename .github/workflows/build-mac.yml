@@ -66,6 +66,20 @@ jobs:
             console.log("sharp", sharp.versions.sharp, "| libvips", sharp.versions.vips, "|", process.arch);
           ' "$SHARP_DIR"
 
+      - name: DMG-Inhalt prüfen
+        shell: bash
+        run: |
+          set -euo pipefail
+          DMG=$(find release -maxdepth 1 -name "*.dmg" | head -n 1)
+          echo "DMG: $DMG"
+          VOLUME="/Volumes/HEIC Konverter"
+          trap 'hdiutil detach "$VOLUME" -quiet || true' EXIT
+          hdiutil attach "$DMG" -nobrowse -readonly -quiet
+          ls -la "$VOLUME"
+          test -d "$VOLUME/HEIC Konverter.app"
+          test -f "$VOLUME/ANLEITUNG-MAC.txt"
+          echo "DMG enthält App und Anleitung."
+
       - name: App-Start testen (informativ)
         shell: bash
         continue-on-error: true
