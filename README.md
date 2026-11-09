@@ -2,8 +2,7 @@
 
 Eine kleine Desktop-App (Electron) für macOS, die **HEIC-/HEIF-Fotos in JPG, PNG, WebP, AVIF und TIFF** umwandelt – per Drag & Drop, in Stapeln, ohne Upload und ohne Cloud.
 
-Unter Windows und Linux läuft sie ebenfalls (praktisch zum Entwickeln und Testen).
-
+Unter Windows und Linux ebenfalls lauffähig.
 ![HEIC Konverter](docs/screenshot.png)
 
 ---
@@ -75,39 +74,6 @@ Optionen: `--format jpg|png|webp|avif|tiff`, `--quality 1-100`, `--max-size <px>
 
 ---
 
-## macOS-App bauen
-
-> **Wichtig:** Ein `.dmg` für macOS lässt sich nur auf macOS bauen (Apple-Werkzeuge und Codesignatur). Es gibt zwei Wege: **GitHub Actions** (ohne eigenen Mac) oder einen lokalen Mac.
-
-### Über GitHub Actions (ohne Mac)
-
-Der Workflow `.github/workflows/build-mac.yml` baut auf den macOS-Runnern von GitHub je ein DMG + ZIP für **Apple Silicon (arm64)** und **Intel (x64)**.
-
-1. Auf GitHub: **Actions → macOS Build → Run workflow → Run workflow**
-2. Nach ca. 5–10 Minuten unten unter **Artifacts** herunterladen:
-   - `heic-konverter-macos-arm64` (M1/M2/M3/M4)
-   - `heic-konverter-macos-x64` (Intel-Macs)
-3. DMG öffnen, App in den Ordner **Programme** ziehen und starten. Im DMG liegt die Datei **ANLEITUNG-MAC.txt** mit allen Schritten für den ersten Start.
-
-Beim Push eines Tags (z. B. `git tag v1.0.0` und `git push --tags`) werden die Dateien zusätzlich an ein **GitHub-Release** gehängt – dort sind sie auch ohne Login herunterladbar.
-
-Die App wird **ad-hoc signiert** (ohne Apple-Developer-Zertifikat). Das ist auf Apple Silicon Voraussetzung dafür, dass die App überhaupt startet. Beim ersten Start meldet Gatekeeper trotzdem, die App sei aus dem Internet geladen – siehe unten.
-
-### Direkt auf einem Mac
-
-```bash
-npm install
-npm run icon        # erzeugt build/icon.png (einmalig, optional)
-npm run dist:mac    # erzeugt DMG + ZIP in release/
-```
-
-Standardmäßig entsteht ein Build für die **Architektur des Macs, auf dem du baust**. Das ist wichtig, weil `sharp` architekturspezifische Binaries enthält:
-
-- Apple Silicon: `npm run dist:mac:arm64`
-- Intel: `npm run dist:mac:x64` (am besten auf einem Intel-Mac ausführen)
-
-Ein Universal-Build für beide Architekturen ist mit `sharp` nicht ohne zusätzliche Vorbereitung möglich – baue die Variante, die du brauchst.
-
 ### Erster Start (Gatekeeper)
 
 Die App ist **ad-hoc signiert**, aber nicht notarisiert. Beim ersten Start aus dem Internet blockiert Gatekeeper sie deshalb. So lässt sie sich öffnen:
@@ -169,7 +135,7 @@ samples/                  Testdatei
 
 ## Hinweise & Grenzen
 
-- **Metadaten:** EXIF-/GPS-Daten werden nicht übernommen – die Ausgabe enthält nur die Bilddaten (gut für Datenschutz).
+- **Metadaten:** EXIF-/GPS-Daten werden nicht übernommen – die Ausgabe enthält nur die Bilddaten.
 - **Live Photos:** Es wird nur das Standbild konvertiert, nicht das Videoteil.
 - **Mehrbild-HEIC:** Es wird das primäre Bild verwendet.
 - **Alpha-Transparenz** bleibt bei PNG, WebP, AVIF und TIFF erhalten; JPG bekommt einen weißen Hintergrund.
