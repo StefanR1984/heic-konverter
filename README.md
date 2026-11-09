@@ -74,7 +74,7 @@ Der Workflow `.github/workflows/build-mac.yml` baut auf den macOS-Runnern von Gi
 2. Nach ca. 5–10 Minuten unten unter **Artifacts** herunterladen:
    - `heic-konverter-macos-arm64` (M1/M2/M3/M4)
    - `heic-konverter-macos-x64` (Intel-Macs)
-3. DMG öffnen, App in den Ordner **Programme** ziehen und starten.
+3. DMG öffnen, App in den Ordner **Programme** ziehen und starten. Im DMG liegt die Datei **ANLEITUNG-MAC.txt** mit allen Schritten für den ersten Start.
 
 Beim Push eines Tags (z. B. `git tag v1.0.0` und `git push --tags`) werden die Dateien zusätzlich an ein **GitHub-Release** gehängt – dort sind sie auch ohne Login herunterladbar.
 
@@ -107,6 +107,8 @@ Alternativ einmalig im Terminal:
 ```bash
 xattr -dr com.apple.quarantine "/Applications/HEIC Konverter.app"
 ```
+
+Diese Anleitung liegt auch als **[ANLEITUNG-MAC.txt](ANLEITUNG-MAC.txt)** im Projekt und direkt im DMG-Fenster bei.
 
 Für Weitergabe an viele Leute: mit Developer-ID signieren und notarizieren (siehe electron-builder-Doku, `CSC_LINK` / `APPLE_ID`).
 

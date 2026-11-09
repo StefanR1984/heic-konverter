@@ -58,10 +58,13 @@ jobs:
           codesign -dv --verbose=4 "$APP_PATH" 2>&1 | head -n 20
           BIN=$(find "$APP_PATH/Contents/MacOS" -maxdepth 1 -type f -perm -111 | head -n 1)
           echo "Binary: $BIN"
+          SHARP_DIR="$APP_PATH/Contents/Resources/app.asar.unpacked/node_modules/sharp"
+          test -d "$SHARP_DIR"
           ELECTRON_RUN_AS_NODE=1 "$BIN" -e '
-            const sharp = require(process.argv[1]);
+            const path = require("node:path");
+            const sharp = require(path.resolve(process.argv[1]));
             console.log("sharp", sharp.versions.sharp, "| libvips", sharp.versions.vips, "|", process.arch);
-          ' "$APP_PATH/Contents/Resources/app.asar.unpacked/node_modules/sharp"
+          ' "$SHARP_DIR"
 
       - name: App-Start testen (informativ)
         shell: bash

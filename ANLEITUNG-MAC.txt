@@ -1,0 +1,92 @@
+=====================================================
+ HEIC KONVERTER – INSTALLATION AUF DEM MAC
+=====================================================
+
+Die App läuft komplett offline und ist nicht mit einem kostenpflichtigen
+Apple-Entwicklerzertifikat signiert. Deshalb zeigt macOS beim allerersten
+Start eine Warnung. Das ist normal – die App ist nicht beschädigt.
+
+Voraussetzung: macOS 13 (Ventura) oder neuer
+               Apple Silicon (M1–M4) oder Intel
+
+
+1. PASSENDE VERSION WÄHLEN
+-----------------------------------------------------
+   Apple Silicon  ->  HEIC-Konverter-<Version>-arm64.dmg
+   Intel-Mac      ->  HEIC-Konverter-<Version>-x64.dmg
+
+   Welcher Mac?  ->  Apfel-Menü  >  "Über diesen Mac"
+                     ("Chip" = Apple Silicon, "Prozessor" = Intel)
+
+
+2. INSTALLIEREN
+-----------------------------------------------------
+   1. DMG-Datei doppelklicken.
+   2. "HEIC Konverter" auf den Ordner "Programme" ziehen.
+   3. DMG-Fenster schließen, DMG im Finder auswerfen.
+
+
+3. ERSTER START – so geht's (einmalig)
+-----------------------------------------------------
+   a) Im Ordner "Programme" doppelklicken.
+      macOS meldet: "... kann nicht geöffnet werden, da Apple nicht
+      überprüfen kann, ob sie Schadsoftware enthält."
+
+   b) Auf "OK" klicken.  (NICHT auf "In den Papierkorb legen"!)
+
+   c) Apfel-Menü > Systemeinstellungen > Datenschutz & Sicherheit
+      Ganz nach unten scrollen. Bei "HEIC Konverter" auf
+      "Trotzdem öffnen" klicken.
+
+   d) Mit Passwort oder Touch ID bestätigen und im nächsten Dialog
+      noch einmal "Trotzdem öffnen" wählen.
+
+   Fertig. Ab jetzt startet die App per Doppelklick wie jede andere.
+   Dieser Schritt ist nur EINMAL nötig.
+
+
+4. FALLS DER KNOPF NICHT ERSCHEINT (Terminal)
+-----------------------------------------------------
+   Programme > Dienstprogramme > Terminal öffnen und einfügen:
+
+   xattr -dr com.apple.quarantine "/Applications/HEIC Konverter.app"
+
+   Danach die App normal starten.
+
+   Das entfernt nur die Internet-Markierung ("Quarantäne") der Datei.
+   Die App selbst wird dabei nicht verändert.
+
+
+5. MELDUNG "APP IST BESCHÄDIGT"
+-----------------------------------------------------
+   Fast immer ist auch das nur die Quarantäne-Markierung.
+   Lösung: Schritt 4 ausführen. Erst wenn das nicht hilft, ist
+   tatsächlich etwas mit dem Download schiefgelaufen – dann die DMG
+   erneut herunterladen.
+
+
+6. SO FUNKTIONIERT DIE APP
+-----------------------------------------------------
+   * HEIC-/HEIF-Dateien oder ganze Ordner ins Fenster ziehen
+     (oder über "Dateien wählen").
+   * Zielformat wählen: JPG, PNG, WebP, AVIF oder TIFF.
+   * Qualität und maximale Bildgröße einstellen.
+   * "Konvertieren" klicken – Fortschritt und Ergebnis erscheinen
+     direkt in der App.
+   * Alles passiert lokal auf dem Mac. Es werden keine Bilder
+     hochgeladen und keine Daten gesammelt.
+
+   Tipp: "Öffnen mit > HEIC Konverter" funktioniert auch direkt
+   aus dem Finder.
+
+
+7. DEINSTALLIEREN
+-----------------------------------------------------
+   "HEIC Konverter" aus "Programme" in den Papierkorb ziehen.
+
+
+Projekt & Quellcode:
+https://github.com/StefanR1984/heic-konverter
+
+Fragen oder Probleme? Dort gern ein Issue anlegen.
+=====================================================
