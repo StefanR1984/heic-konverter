@@ -74,14 +74,21 @@ jobs:
           if (-not (Test-Path (Join-Path $dir "ANLEITUNG-WINDOWS.txt"))) { throw "Anleitung fehlt." }
           Write-Host "Installation erfolgreich."
 
+      - name: Dateien für den Upload bündeln
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p staging
+          cp release/HEIC-Konverter-Setup-*-x64.exe staging/
+          cp release/HEIC-Konverter-Portable-*-x64.exe staging/
+          cp ANLEITUNG-WINDOWS.txt staging/
+          ls -la staging
+
       - name: Artefakte hochladen
         uses: actions/upload-artifact@v4
         with:
           name: heic-konverter-windows-x64
-          path: |
-            release/HEIC-Konverter-Setup-*-x64.exe
-            release/HEIC-Konverter-Portable-*-x64.exe
-            ANLEITUNG-WINDOWS.txt
+          path: staging/*
           if-no-files-found: error
           retention-days: 30
 
@@ -104,11 +111,18 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
+          # Dateien unabhängig von der Ordnerstruktur im Artefakt einsammeln
+          mapfile -t FILES < <(find artifacts -type f \( -name "*.exe" -o -name "ANLEITUNG-WINDOWS.txt" \))
+          if [ "${#FILES[@]}" -eq 0 ]; then
+            echo "Keine Release-Dateien gefunden:"; find artifacts -type f; exit 1
+          fi
+          printf 'Release-Datei: %s\n' "${FILES[@]}"
           if gh release view "${GITHUB_REF_NAME}" --repo "${GITHUB_REPOSITORY}" > /dev/null 2>&1; then
-            gh release upload "${GITHUB_REF_NAME}" artifacts/*.exe artifacts/ANLEITUNG-WINDOWS.txt \
+            gh release upload "${GITHUB_REF_NAME}" "${FILES[@]}" \
               --repo "${GITHUB_REPOSITORY}" --clobber
           else
-            gh release create "${GITHUB_REF_NAME}" artifacts/*.exe artifacts/ANLEITUNG-WINDOWS.txt \
+            gh release create "${GITHUB_REF_NAME}" "${FILES[@]}" \
               --repo "${GITHUB_REPOSITORY}" \
               --title "HEIC Konverter ${GITHUB_REF_NAME}" \
               --notes-file docs/RELEASE_NOTES.md
