@@ -1,8 +1,8 @@
 # HEIC Konverter
 
-Eine kleine Desktop-App (Electron) für macOS, die **HEIC-/HEIF-Fotos in JPG, PNG, WebP, AVIF und TIFF** umwandelt – per Drag & Drop, in Stapeln, ohne Upload und ohne Cloud.
+Eine kleine Desktop-App (Electron) für macOS und Windows, die **HEIC-/HEIF-Fotos in JPG, PNG, WebP, AVIF und TIFF** umwandelt – per Drag & Drop, in Stapeln, ohne Upload und ohne Cloud.
 
-Unter Windows und Linux ebenfalls lauffähig.
+Unter Linux ebenfalls lauffähig (aus dem Quellcode).
 ![HEIC Konverter](docs/screenshot.png)
 
 ---
@@ -17,6 +17,17 @@ Fertige DMGs liegen unter **[Releases](https://github.com/StefanR1984/heic-konve
 | Intel | `HEIC-Konverter-<Version>-x64.dmg` |
 
 Die App ist nicht notarisiert, deshalb warnt macOS beim ersten Start. Die nötigen Schritte stehen in **[ANLEITUNG-MAC.txt](ANLEITUNG-MAC.txt)** (liegt auch im DMG bei).
+
+## Download (Windows)
+
+Fertige Programme liegen ebenfalls unter **[Releases](https://github.com/StefanR1984/heic-konverter/releases)** (Windows 10/11, 64 Bit):
+
+| Variante | Datei | Für wen |
+| --- | --- | --- |
+| Installer | `HEIC-Konverter-Setup-<Version>-x64.exe` | normale Installation mit Startmenü-/Desktop-Verknüpfung und „Öffnen mit“ für `.heic`/`.heif` (ohne Administratorrechte) |
+| Portable | `HEIC-Konverter-Portable-<Version>-x64.exe` | einzelne Datei ohne Installation, z. B. für USB-Stick |
+
+Die App ist nicht signiert, deshalb zeigt Windows beim ersten Start die SmartScreen-Warnung („Weitere Informationen“ → „Trotzdem ausführen“). Alle Schritte stehen in **[ANLEITUNG-WINDOWS.txt](ANLEITUNG-WINDOWS.txt)** (liegt auch im Installationsordner bei). Die HEIF-Erweiterungen aus dem Microsoft Store sind nicht nötig.
 
 ---
 
@@ -102,11 +113,19 @@ Für Weitergabe an viele Leute: mit Developer-ID signieren und notarizieren (sie
 - **„App ist beschädigt“** auf macOS: meist nur die Quarantäne-Markierung, siehe oben (`xattr -dr …`).
 - **`sharp`-Fehler nach Architekturwechsel:** `node_modules` löschen und auf der Zielarchitektur neu installieren.
 
-### Windows/Linux (optional)
+### Windows-Build
+
+Am zuverlässigsten auf einem Windows-Rechner oder über den GitHub-Workflow **Windows Build** (Actions → Windows Build → „Run workflow“; bei einem Tag wie `v1.0.0` wird zusätzlich ein Release angelegt). Lokal:
 
 ```bash
-npm run dist:win
+npm run dist:win             # Installer + Portable
+npm run dist:win:installer   # nur Installer (NSIS)
+npm run dist:win:portable    # nur Portable
 ```
+
+Die Dateien landen in `release/`. Ein Windows-Build unter Linux oder macOS braucht zusätzlich Wine und die Windows-Variante von `sharp` (`@img/sharp-win32-x64`).
+
+Bei der Portable-Variante entpackt sich die App bei jedem Start in einen temporären Ordner, der erste Start dauert daher einige Sekunden.
 
 ---
 

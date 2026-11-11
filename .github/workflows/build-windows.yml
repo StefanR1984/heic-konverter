@@ -1,0 +1,115 @@
+name: Windows Build
+
+on:
+  # Manuell starten: Actions → Windows Build → "Run workflow"
+  workflow_dispatch:
+  # Beim Push eines Tags wie v1.0.0 zusätzlich ein GitHub-Release anlegen
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: windows-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Windows x64 (Installer + Portable)
+    runs-on: windows-latest
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Node.js einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Abhängigkeiten installieren
+        run: npm ci
+
+      - name: App-Icon erzeugen
+        run: npm run icon
+
+      - name: Windows-App bauen (Installer + Portable)
+        run: npx electron-builder --win --x64 --publish never
+
+      - name: Artefakte prüfen
+        shell: bash
+        run: |
+          set -euo pipefail
+          ls -la release
+          test -n "$(find release -maxdepth 1 -name 'HEIC-Konverter-Setup-*-x64.exe')"
+          test -n "$(find release -maxdepth 1 -name 'HEIC-Konverter-Portable-*-x64.exe')"
+          test -f "release/win-unpacked/ANLEITUNG-WINDOWS.txt"
+          test -d "release/win-unpacked/resources/app.asar.unpacked/node_modules/sharp"
+
+      - name: Native Module testen (sharp + HEIC-Decoder)
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXE="release/win-unpacked/HEIC Konverter.exe"
+          SHARP_DIR="release/win-unpacked/resources/app.asar.unpacked/node_modules/sharp"
+          ELECTRON_RUN_AS_NODE=1 "$EXE" -e '
+            const path = require("node:path");
+            const sharp = require(path.resolve(process.argv[1]));
+            console.log("sharp", sharp.versions.sharp, "| libvips", sharp.versions.vips, "|", process.arch);
+            require(path.resolve(process.argv[1], "..", "heic-decode"));
+            console.log("heic-decode geladen");
+          ' "$SHARP_DIR"
+
+      - name: Installer-Test (stille Installation)
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          $setup = Get-ChildItem release -Filter "HEIC-Konverter-Setup-*-x64.exe" | Select-Object -First 1
+          $dir = Join-Path $env:RUNNER_TEMP "heic-install"
+          Start-Process -FilePath $setup.FullName -ArgumentList "/S", "/D=$dir" -Wait
+          Get-ChildItem $dir | Select-Object Name
+          if (-not (Test-Path (Join-Path $dir "HEIC Konverter.exe"))) { throw "App wurde nicht installiert." }
+          if (-not (Test-Path (Join-Path $dir "ANLEITUNG-WINDOWS.txt"))) { throw "Anleitung fehlt." }
+          Write-Host "Installation erfolgreich."
+
+      - name: Artefakte hochladen
+        uses: actions/upload-artifact@v4
+        with:
+          name: heic-konverter-windows-x64
+          path: |
+            release/HEIC-Konverter-Setup-*-x64.exe
+            release/HEIC-Konverter-Portable-*-x64.exe
+            ANLEITUNG-WINDOWS.txt
+          if-no-files-found: error
+          retention-days: 30
+
+  release:
+    name: Release veröffentlichen
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Artefakte herunterladen
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: GitHub-Release anlegen oder ergänzen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "${GITHUB_REF_NAME}" --repo "${GITHUB_REPOSITORY}" > /dev/null 2>&1; then
+            gh release upload "${GITHUB_REF_NAME}" artifacts/*.exe artifacts/ANLEITUNG-WINDOWS.txt \
+              --repo "${GITHUB_REPOSITORY}" --clobber
+          else
+            gh release create "${GITHUB_REF_NAME}" artifacts/*.exe artifacts/ANLEITUNG-WINDOWS.txt \
+              --repo "${GITHUB_REPOSITORY}" \
+              --title "HEIC Konverter ${GITHUB_REF_NAME}" \
+              --notes-file docs/RELEASE_NOTES.md
+          fi

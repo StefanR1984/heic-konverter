@@ -18,7 +18,9 @@
     "dist:mac": "electron-builder --mac",
     "dist:mac:arm64": "electron-builder --mac --arm64",
     "dist:mac:x64": "electron-builder --mac --x64",
-    "dist:win": "electron-builder --win"
+    "dist:win": "electron-builder --win --x64",
+    "dist:win:installer": "electron-builder --win nsis --x64",
+    "dist:win:portable": "electron-builder --win portable --x64"
   },
   "dependencies": {
     "heic-decode": "^2.1.0",
@@ -98,7 +100,43 @@
     },
     "win": {
       "icon": "build/icon.png",
-      "target": "nsis"
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "extraFiles": [
+        {
+          "from": "ANLEITUNG-WINDOWS.txt",
+          "to": "ANLEITUNG-WINDOWS.txt"
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "HEIC Konverter",
+      "deleteAppDataOnUninstall": false,
+      "installerLanguages": [
+        "de_DE"
+      ],
+      "language": "1031",
+      "artifactName": "HEIC-Konverter-Setup-${version}-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "HEIC-Konverter-Portable-${version}-${arch}.${ext}"
     },
     "linux": {
       "icon": "build/icon.png",

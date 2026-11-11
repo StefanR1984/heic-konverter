@@ -1,0 +1,127 @@
+=====================================================
+ HEIC KONVERTER – INSTALLATION UNTER WINDOWS
+=====================================================
+
+Die App läuft komplett offline. Es werden keine Bilder hochgeladen
+und keine Daten gesammelt. Sie ist nicht mit einem kostenpflichtigen
+Code-Signing-Zertifikat signiert. Deshalb zeigt Windows beim allerersten
+Start eine Warnung (SmartScreen). Das ist normal – die App ist nicht
+beschädigt.
+
+Voraussetzung: Windows 10 oder Windows 11, 64 Bit (x64)
+               Die Windows-Erweiterung "HEIF-Bilderweiterungen" aus dem
+               Microsoft Store wird NICHT benötigt – die App bringt
+               ihren eigenen HEIC-Decoder mit.
+
+
+1. PASSENDE VERSION WÄHLEN
+-----------------------------------------------------
+   Installer  ->  HEIC-Konverter-Setup-<Version>-x64.exe
+                  Wird installiert, bekommt Startmenü- und
+                  Desktop-Verknüpfung und taucht unter "Apps" auf.
+
+   Portable   ->  HEIC-Konverter-Portable-<Version>-x64.exe
+                  Einzelne Datei, keine Installation. Ideal für
+                  USB-Stick oder Rechner ohne Installationsrechte.
+
+
+2A. INSTALLER – so geht's
+-----------------------------------------------------
+   1. HEIC-Konverter-Setup-<Version>-x64.exe doppelklicken.
+   2. Falls die SmartScreen-Warnung erscheint, siehe Schritt 3.
+   3. Installationsordner bestätigen oder ändern, "Installieren".
+      (Standard: nur für dein Benutzerkonto, es sind keine
+      Administratorrechte nötig.)
+   4. Nach dem Setup startet die App über die Desktop-Verknüpfung
+      oder das Startmenü ("HEIC Konverter").
+
+   Der Installer richtet außerdem "Öffnen mit > HEIC Konverter" für
+   .heic- und .heif-Dateien ein. Als Standardprogramm wird die App
+   NICHT automatisch gesetzt – das kannst du bei Bedarf selbst tun:
+   Rechtsklick auf eine HEIC-Datei > "Öffnen mit" > "Andere App
+   auswählen" > "HEIC Konverter" > "Immer".
+
+
+2B. PORTABLE – so geht's
+-----------------------------------------------------
+   1. HEIC-Konverter-Portable-<Version>-x64.exe in einen beliebigen
+      Ordner oder auf einen USB-Stick legen.
+   2. Doppelklicken. Der erste Start dauert einige Sekunden, weil
+      sich die App dabei entpackt.
+   3. Falls die SmartScreen-Warnung erscheint, siehe Schritt 3.
+
+   Es wird nichts installiert und kein Eintrag in "Apps" angelegt.
+   Zum Entfernen die Datei einfach löschen.
+
+   Tipp: HEIC-Dateien direkt auf die .exe ziehen, dann startet die
+   App gleich mit diesen Dateien.
+
+
+3. ERSTER START – SmartScreen-Warnung (einmalig)
+-----------------------------------------------------
+   Windows meldet: "Der Computer wurde durch Windows geschützt".
+
+   a) Auf "Weitere Informationen" klicken.
+      (Der Knopf "Trotzdem ausführen" ist erst danach sichtbar.)
+
+   b) Auf "Trotzdem ausführen" klicken.
+
+   Fertig. Bei der Portable-Version kann die Warnung bei jeder neu
+   heruntergeladenen Datei erneut erscheinen, beim installierten
+   Programm nur beim Setup.
+
+
+4. FALLS "TROTZDEM AUSFÜHREN" FEHLT
+-----------------------------------------------------
+   Das passiert, wenn die Datei als "aus dem Internet" markiert ist
+   und eine Richtlinie das blockiert.
+
+   Datei mit Rechtsklick > "Eigenschaften" öffnen. Unten bei
+   "Sicherheit" den Haken bei "Zulassen" setzen, "OK" klicken und
+   die Datei erneut starten.
+
+   Alternativ in PowerShell (Pfad anpassen):
+
+   Unblock-File -Path "$env:USERPROFILE\Downloads\HEIC-Konverter-Setup-<Version>-x64.exe"
+
+   Das entfernt nur die Internet-Markierung der Datei. Die Datei
+   selbst wird dabei nicht verändert.
+
+
+5. VIRENSCANNER MELDET ETWAS?
+-----------------------------------------------------
+   Nicht signierte Programme lösen manchmal Fehlalarme aus. Lade
+   die Datei nur von der offiziellen Release-Seite herunter:
+   https://github.com/StefanR1984/heic-konverter/releases
+   Der gesamte Quellcode ist dort einsehbar.
+
+
+6. SO FUNKTIONIERT DIE APP
+-----------------------------------------------------
+   * HEIC-/HEIF-Dateien oder ganze Ordner ins Fenster ziehen
+     (oder über "Dateien wählen").
+   * Zielformat wählen: JPG, PNG, WebP, AVIF oder TIFF.
+   * Qualität und maximale Bildgröße einstellen.
+   * Zielordner wählen oder die Bilder neben dem Original speichern.
+   * "Konvertieren" klicken – Fortschritt und Ergebnis erscheinen
+     direkt in der App.
+   * "Im Explorer zeigen" öffnet den Ordner mit dem Ergebnis.
+   * Vorhandene Dateien werden nie überschrieben, stattdessen
+     entsteht z. B. "Foto (1).jpg".
+
+   Hinweis: EXIF-/GPS-Daten werden nicht übernommen. Bei Live Photos
+   wird nur das Standbild konvertiert.
+
+
+7. DEINSTALLIEREN
+-----------------------------------------------------
+   Installer-Version:  Einstellungen > Apps > Installierte Apps >
+                       "HEIC Konverter" > Deinstallieren
+   Portable-Version:   .exe-Datei löschen.
+
+
+Projekt & Quellcode:
+https://github.com/StefanR1984/heic-konverter
+
+Fragen oder Probleme? Dort gern ein Issue anlegen.
+=====================================================

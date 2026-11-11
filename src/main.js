@@ -329,21 +329,41 @@ for (const arg of launchArgs) {
   if (!arg.startsWith('-')) queuePath(arg);
 }
 
+// Only one window at a time: "Open with" on Windows/Linux starts a new process
+// per file, so a second launch hands its files to the running instance.
+const isPrimaryInstance = IS_DEV || app.requestSingleInstanceLock();
+if (!isPrimaryInstance) {
+  app.quit();
+}
+
+app.on('second-instance', (_event, argv) => {
+  for (const arg of argv.slice(app.isPackaged ? 1 : 2)) {
+    if (!arg.startsWith('-')) queuePath(arg);
+  }
+  flushPendingFiles();
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+  }
+});
+
 app.on('open-file', (event, filePath) => {
   event.preventDefault();
   queuePath(filePath);
   flushPendingFiles();
 });
 
-app.whenReady().then(() => {
-  app.setName('HEIC Konverter');
-  buildMenu();
-  createWindow();
+if (isPrimaryInstance) {
+  app.whenReady().then(() => {
+    app.setName('HEIC Konverter');
+    buildMenu();
+    createWindow();
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    });
   });
-});
+}
 
 app.on('window-all-closed', () => {
   stopWorker();
